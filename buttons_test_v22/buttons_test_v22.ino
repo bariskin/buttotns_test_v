@@ -506,7 +506,7 @@ void HandlerKLEV(void)
         counterKLEV++;
        
         // TODO   begin 
-         if(counterKLEV > 200 && flagKLEV_KVAR != ON )         // дополнительное управление  аварийкой 
+         if(counterKLEV > 50 && flagKLEV_KVAR != ON )         // дополнительное управление  аварийкой 
          { 
             flagKLEV_KVAR = ON;
             
@@ -617,7 +617,7 @@ void HandlerKLEV(void)
         counterKPRAV++;
 
        // TODO   begin 
-         if(counterKPRAV > 200 && flagKPRAV_KVAR  != ON )                    // дополнительное управление  аварийкой 
+         if(counterKPRAV > 50 && flagKPRAV_KVAR  != ON )                    // дополнительное управление  аварийкой 
          { 
             flagKPRAV_KVAR  = ON;
             

@@ -499,9 +499,9 @@ void HandlerKSVET(void)
  */
 void HandlerKLEV(void)
  {
-    stateKLEV= digitalRead(KLEV);
+    stateKLEV = digitalRead(KLEV);
     
-    if(stateKLEV)
+    if(stateKLEV && flagKLEV == OFF)
       {
         counterKLEV++;
        
@@ -611,7 +611,7 @@ void HandlerKLEV(void)
  void HandlerKPRAV(void)
   {
     stateKPRAV= digitalRead(KPRAV);
-    if(stateKPRAV&&(flagKPRAV == OFF))
+    if(stateKPRAV && flagKPRAV == OFF)
       {
         counterKPRAV++;
 
