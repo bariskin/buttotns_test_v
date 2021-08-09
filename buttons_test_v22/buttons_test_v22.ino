@@ -505,7 +505,7 @@ void HandlerKLEV(void)
       {
         counterKLEV++;
        
-        // TODO   begin 
+ // TODO   begin 
          if(counterKLEV > 50 && flagKLEV_KVAR != ON )         // дополнительное управление  аварийкой 
          { 
             flagKLEV_KVAR = ON;
@@ -513,12 +513,12 @@ void HandlerKLEV(void)
             HadlerKAVAR_function();       
          }
        
-        else if(counterKLEV > 2 && flagKLEV != ON )
+        else if(counterKLEV > 2 && counterKLEV  < 4  && flagKLEV != ON )
          {
            flagKLEV = ON;
            
-         // TODO   end   
-         // Serial.println("KLEV ON");
+ // TODO   end   
+        
 
             if(counterKLEV_PRESS == KLEV_PRESS_0)        // при  первом нажатии
               {
@@ -616,7 +616,7 @@ void HandlerKLEV(void)
       {
         counterKPRAV++;
 
-       // TODO   begin 
+// TODO   begin 
          if(counterKPRAV > 50 && flagKPRAV_KVAR  != ON )                    // дополнительное управление  аварийкой 
          { 
             flagKPRAV_KVAR  = ON;
@@ -624,9 +624,11 @@ void HandlerKLEV(void)
             HadlerKAVAR_function();       
          }
        
-        else if(counterKPRAV > 2 && flagKPRAV != ON )
+       else  if(counterKPRAV > 2 && counterKPRAV  < 4 && flagKPRAV != ON )
          {
            flagKPRAV = ON;
+
+// TODO   end           
           Serial.println("KPRAV ON");
 
             if(counterKPRAV_PRESS == KPRAV_PRESS_0)        // при  первом нажатии
@@ -700,6 +702,7 @@ void HandlerKLEV(void)
                 }
           }
        }
+       
       else if(!stateKPRAV&&(flagKPRAV == ON))
        {
           flagKPRAV = OFF;
