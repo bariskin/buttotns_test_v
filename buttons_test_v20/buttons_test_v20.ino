@@ -508,12 +508,13 @@ void HandlerKLEV(void)
         // TODO
          if(counterKAVAR_second > 250)                    // дополнительное управление  аварийкой 
          { 
+            flagKLEV = ON;
             HadlerKAVAR_function();
          }
        
         else if(counterKLEV > 2)
          {
-          flagKLEV = ON;
+           flagKLEV = ON;
           
          // Serial.println("KLEV ON");
 
@@ -612,6 +613,7 @@ void HandlerKLEV(void)
         // TODO
          if(counterKAVAR_second > 250)                           // дополнительное управление  аварийкой 
          { 
+            flagKLEV = ON;
             HadlerKAVAR_function();
          }
        
