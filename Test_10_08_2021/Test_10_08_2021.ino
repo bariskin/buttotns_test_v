@@ -15,7 +15,9 @@ byte flagKPRAV_KVAR  = OFF;
  
 void setup() {
   // put your setup code here, to run once:
+ pinMode(KPRAV, INPUT);
 
+  Serial.begin(9600);
 }
 
 void loop() {
@@ -33,35 +35,41 @@ void loop() {
         {
           counterKPRAV++;
   
-           if(counterKPRAV > 50 && flagKPRAV_KVAR  != ON )                    // дополнительное управление  аварийкой 
+           if(counterKPRAV > 150 && flagKPRAV_KVAR  != ON )                    // дополнительное управление  аварийкой 
            { 
               flagKPRAV_KVAR  = ON;
+              flagKPRAV = ON;
               
               Serial.println("KPRAV_KVAR  ON");   
            }
-         
-         else if(counterKPRAV > 2 && counterKPRAV  < 4 && flagKPRAV != ON )
+    
+        }
+
+       else if(counterKPRAV > 5 && flagKPRAV != ON )
            {
-             flagKPRAV = ON;
-               
-             Serial.println("KPRAV ON");
-         }
-         
+    
+            for (int i = 0;i < 20; i++ )
+            {
+              reading  = digitalRead(KPRAV);     
+              if(!reading) 
+              {                 
+                 flagKPRAV_KVAR  = ON;
+                 flagKPRAV = ON;
+                 
+                 Serial.println("KPRAV ON"); 
+                 break;             
+               }    
+            }      
+           }
+  
         else if(!reading&&(flagKPRAV == ON))
          {
             Serial.println("KPRAV OFF");
             flagKPRAV = OFF;
-            counterKPRAV = 0;
-         }
-  
-         else if (!reading&&(flagKPRAV_KVAR  == ON))
-         { 
-            Serial.println("KPRAV_KVAR  OFF");
             flagKPRAV_KVAR  = OFF; 
             counterKPRAV = 0;
          }
-         
-        }
-        
+  
+          
         lastReading = reading;     
     }
