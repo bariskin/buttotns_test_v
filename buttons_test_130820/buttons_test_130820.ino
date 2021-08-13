@@ -520,7 +520,7 @@ void HandlerKLEV(void)
          }
        } 
        
-       else if(counterKLEV > 5 && flagKLEV != ON )            /* короткое нажатие */ 
+       else if(counterKLEV > 5 && flagKLEV != ON )             /* короткое нажатие */ 
          {
             for (int i = 0;i < 60; i++ )
             {
@@ -533,7 +533,7 @@ void HandlerKLEV(void)
                  
                  Serial.println("KLEV ON"); 
 //******************************************************************************************************************
-                if(counterKLEV_PRESS == KLEV_PRESS_0)        // при  первом нажатии
+                if(counterKLEV_PRESS == KLEV_PRESS_0)           // при  первом нажатии
                  {
                    counterKLEV_PRESS= KLEV_PRESS_1;
                  }
@@ -541,10 +541,10 @@ void HandlerKLEV(void)
               switch(counterKLEV_PRESS)
                 {
                   case KLEV_PRESS_1:
-                     flagKLEVenable = ON;                // включить мигание KLEV
+                     flagKLEVenable = ON;                       // включить мигание KLEV
                      counterKLEV_PRESS= KLEV_PRESS_2;
                      
-                     flagKPRAVenable = OFF;               // выключить мигание KPRAV
+                     flagKPRAVenable = OFF;                     // выключить мигание KPRAV
                      counterKPRAV_PRESS= KPRAV_PRESS_0;
 
                       if(event_GAB_F_L_R == ON)
@@ -562,19 +562,19 @@ void HandlerKLEV(void)
                           
                        if(event_AVAR == ON)
                          {
-                           flagKAVARenable = OFF;          // выключить мигание KAVAR
+                           flagKAVARenable = OFF;                  // выключить мигание KAVAR
                          } 
 
-                       event_KPRAV_LEV = ON;              // признака включения поворота лююбого 
+                       event_KPRAV_LEV = ON;                       // признака включения поворота лююбого 
                     
                   break;
                   case KLEV_PRESS_2:
-                     flagKLEVenable = OFF;                 // выключить мигание KLEV
+                     flagKLEVenable = OFF;                         // выключить мигание KLEV
                      counterKLEV_PRESS= KLEV_PRESS_0;
 
                         if(event_AVAR == ON)
                          {
-                           flagKAVARenable = ON;             // включить мигание KAVAR
+                           flagKAVARenable = ON;                   // включить мигание KAVAR
                             //Serial.println("GAB_F OFF");
                             mosfet.digitalWrite(0, M1, LOW);
                             
