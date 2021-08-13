@@ -121,15 +121,17 @@ byte event_AVAR = OFF;
 byte event_KPRAV_LEV = OFF;
 
 byte mutex = OFF;
-
-boolean lastReading = false;  // флаг предыдущего состояния кнопки
-boolean reading = false ;     // флаг текущего состояния кнопки 
-
           
 // создаём объект mosfet для работы со сборкой силовых ключей
 // передаём номер пина выбора устройств на шине SPI
 // и количество устройств подключённых в цепочке
 FET mosfet(PIN_CS, 2);
+
+byte lastReadingPRAV = OFF;  // флаг предыдущего состояния кнопки KPRAV
+byte readingPRAV = OFF ;     // флаг текущего состояния кнопки   KPRAV
+
+byte lastReadingLEV = OFF;  // флаг предыдущего состояния кнопки KLEV
+byte readingLEV = OFF ;     // флаг текущего состояния кнопки    KLEV
 
 void setup() {
    pinMode(KSVET, INPUT);
@@ -141,7 +143,7 @@ void setup() {
    pinMode(KDEK,  INPUT);
    pinMode(KREZ,  INPUT);
    
-   Serial.begin(115200);
+   Serial.begin(9600);
   
    Timer1.setPeriod(2000);                 // попадаем раз в 2 ms обработчик 
    Timer1.enableISR(CHANNEL_A);            // Запускаем прерывание (по умолч. канал А)
@@ -488,7 +490,7 @@ void HandlerKSVET(void)
               }      
              }
            }
-        }
+          }
       }
       else if(!stateKSVET && flagKSVET == ON)
        {
@@ -503,32 +505,38 @@ void HandlerKSVET(void)
  */
 void HandlerKLEV(void)
  {
-    reading = digitalRead(KLEV);
+    readingLEV = digitalRead(KLEV);
     
-    if(reading && lastReading)
+    if(readingLEV && lastReadingLEV)
       {
         counterKLEV++;
        
- // TODObegin 
-
-         if(counterKLEV > 50 && flagKLEV_KVAR != ON )         // дополнительное управление  аварийкой 
+         if(counterKLEV > 100 && flagKLEV_KVAR != ON )         /*  длительное нажатие */ 
          { 
             flagKLEV_KVAR = ON;
-            
+            flagKLEV = ON; 
+            Serial.println("KLEV_KVAR  ON");  
             HadlerKAVAR_function();       
          }
+       } 
        
-        else if(counterKLEV > 2 && counterKLEV < 4 && flagKLEV != ON )
+       else if(counterKLEV > 5 && flagKLEV != ON )            /* короткое нажатие */ 
          {
-           flagKLEV = ON;
-           
-           
- // TODOend   
-        
-            if(counterKLEV_PRESS == KLEV_PRESS_0)        // при  первом нажатии
-              {
-                 counterKLEV_PRESS= KLEV_PRESS_1;
-              }
+            for (int i = 0;i < 60; i++ )
+            {
+              readingLEV  = digitalRead(KLEV); 
+              
+             if(!readingLEV) 
+               {
+                 flagKLEV_KVAR  = ON;
+                 flagKLEV = ON;
+                 
+                 Serial.println("KLEV ON"); 
+//******************************************************************************************************************
+                if(counterKLEV_PRESS == KLEV_PRESS_0)        // при  первом нажатии
+                 {
+                   counterKLEV_PRESS= KLEV_PRESS_1;
+                 }
 
               switch(counterKLEV_PRESS)
                 {
@@ -537,7 +545,7 @@ void HandlerKLEV(void)
                      counterKLEV_PRESS= KLEV_PRESS_2;
                      
                      flagKPRAVenable = OFF;               // выключить мигание KPRAV
-                     counterKPRAV_PRESS = KPRAV_PRESS_0;
+                     counterKPRAV_PRESS= KPRAV_PRESS_0;
 
                       if(event_GAB_F_L_R == ON)
                         {
@@ -593,24 +601,20 @@ void HandlerKLEV(void)
                      
                   break;
                 }
-             }
-        
+//********************************************************************************************************  
+               break;
+           }  
+         }
        }
-      else if(!stateKLEV&&(flagKLEV == ON))
+      else if(!readingLEV&&(flagKLEV == ON))
        {
-          flagKLEV = OFF;
-          //Serial.println("KLEV OFF");
-           counterKLEV = 0;
+           Serial.println("KLEV OFF");
+            flagKLEV = OFF;
+            flagKLEV_KVAR  = OFF; 
+            counterKLEV = 0;
        }
 
-      else if(!stateKLEV&&(flagKLEV_KVAR == ON))
-       {  
-         flagKLEV_KVAR = OFF; 
-         counterKLEV = 0;     
-       }
-
-    lastReading = reading;
-       
+      lastReadingLEV = readingLEV; 
   }
 
  /*
@@ -619,33 +623,43 @@ void HandlerKLEV(void)
  
  void HandlerKPRAV(void)
   {
-    stateKPRAV= digitalRead(KPRAV);
+    readingPRAV = digitalRead(KPRAV);
     
-    if(stateKPRAV && flagKPRAV == OFF)
-      {
-        counterKPRAV++;
+     if(readingPRAV && lastReadingPRAV)
+        {   
+         
+          counterKPRAV++;
+  
+           if(counterKPRAV > 100 && flagKPRAV_KVAR  != ON )               /*  длительное нажатие */ 
+           { 
+              flagKPRAV_KVAR  = ON;
+              flagKPRAV = ON;
+              
+              Serial.println("KPRAV_KVAR  ON");  
 
-// TODO   begin 
-         if(counterKPRAV > 50 && flagKPRAV_KVAR  != ON )                    // дополнительное управление  аварийкой 
-         { 
-            flagKPRAV_KVAR  = ON;
-            
-            HadlerKAVAR_function();       
-         }
-       
-       else  if(counterKPRAV > 2 && counterKPRAV  < 4 && flagKPRAV != ON )
-         {
-           flagKPRAV = ON;
-
-// TODO   end           
-          Serial.println("KPRAV ON");
-
-            if(counterKPRAV_PRESS == KPRAV_PRESS_0)        // при  первом нажатии
-              {
+              HadlerKAVAR_function(); 
+           }
+        }
+        
+       else if(counterKPRAV > 5 && flagKPRAV != ON )                       /* короткое нажатие */ 
+           {
+            for (int i = 0;i < 60; i++ )
+            {
+              readingPRAV  = digitalRead(KPRAV); 
+                  
+              if(!readingPRAV) 
+              {                 
+                 flagKPRAV_KVAR  = ON;
+                 flagKPRAV = ON;
+                 
+                 Serial.println("KPRAV ON"); 
+//*********************************************
+               if(counterKPRAV_PRESS == KPRAV_PRESS_0)    // при  первом нажатии
+                {
                  counterKPRAV_PRESS= KLEV_PRESS_1;
-              }
+                }
 
-              switch(counterKPRAV_PRESS)
+                switch(counterKPRAV_PRESS)
                 {
                   case KPRAV_PRESS_1:
                   
@@ -669,14 +683,14 @@ void HandlerKLEV(void)
                     
                      if(event_AVAR == ON)
                        {
-                         flagKAVARenable = OFF;          // выключить мигание KAVAR
+                         flagKAVARenable = OFF;            // выключить мигание KAVAR
                        } 
 
-                      event_KPRAV_LEV = ON;               // включить признак включения поворота
+                      event_KPRAV_LEV = ON;                // включить признак включения поворота
                       
                   break;
                   case KPRAV_PRESS_2:
-                     flagKPRAVenable = OFF;               // выключить мигание KPRAV
+                     flagKPRAVenable = OFF;                // выключить мигание KPRAV
                      counterKPRAV_PRESS= KPRAV_PRESS_0;
                      
                        if(event_AVAR == ON)
@@ -709,20 +723,21 @@ void HandlerKLEV(void)
                      
                   break;
                 }
+//*********************************************
+                 break;             
+               }    
+            }      
           }
-       }
-       
-      else if(!stateKPRAV&&(flagKPRAV == ON))
-       {
-          flagKPRAV = OFF;
-          counterKPRAV = 0;
-       }
-
-       else if (!stateKPRAV&&(flagKPRAV_KVAR  == ON))
-       { 
-        flagKPRAV_KVAR  = OFF; 
-        counterKPRAV = 0;
-       }
+  
+        else if(!readingPRAV&&(flagKPRAV == ON))                               /* отключить  */       
+         {
+            Serial.println("KPRAV OFF");
+            flagKPRAV = OFF;
+            flagKPRAV_KVAR  = OFF; 
+            counterKPRAV = 0;
+         }
+   
+        lastReadingPRAV = readingPRAV;     
        
   }
  void HandlerKAVAR(void)
@@ -966,8 +981,7 @@ void  HadlerKAVAR_function(void)
                          mutex = OFF;
                          event_KPRAV_LEV = OFF;               // признака вык
 
-                       
-                       
+                                    
                       if(event_GAB_F_L_R == ON)
                         {
                         //Serial.println("GAB_F ON");

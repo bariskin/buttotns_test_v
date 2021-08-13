@@ -47,7 +47,6 @@ void loop() {
 
        else if(counterKPRAV > 5 && flagKPRAV != ON )
            {
-    
             for (int i = 0;i < 20; i++ )
             {
               reading  = digitalRead(KPRAV);     
